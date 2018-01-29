@@ -6,6 +6,29 @@ public class User {
 
     private String username;
     private String password;
+    private String address;
+    private ArrayList<Mail> mails = new ArrayList<>();
+
+    public ArrayList<Mail> getMails() {
+        return mails;
+    }
+
+    public void addMail(Mail m){
+        mails.add(m);
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
 
     static public User getUser(String username){
         for(User user: m_users){
@@ -18,7 +41,10 @@ public class User {
     public User(String name, String pwd){
         this.username = name;
         this.password = pwd;
+        this.address = name + ".test@test.fr";
         m_users.add(this);
     }
+
+
 
 }

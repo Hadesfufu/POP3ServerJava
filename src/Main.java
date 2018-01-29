@@ -1,5 +1,6 @@
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Main {
 
@@ -9,6 +10,8 @@ public class Main {
         ArrayList<Server> m_servers = new ArrayList<>();
         ArrayList<Thread> m_threads = new ArrayList<>();
         new User("Marco", "Polo");
+        new User("jean", "jean");
+        initMails();
         try {
             boolean serverRunning = true;
 
@@ -26,4 +29,15 @@ public class Main {
             System.err.println(e.getMessage());
         }
     }
+
+    public static void initMails(){
+        Mail mail = new Mail(User.getUser("jean"));
+        mail.setContent("This is a message to say hello. \n\n hello then.");
+        mail.setDate(new Date());
+        mail.setFromAdress("test@domain.fr");
+        mail.setFromName("test");
+        mail.setMessageId(1);
+        mail.setObject("The test message");
+    }
+
 }

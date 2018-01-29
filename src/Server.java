@@ -42,8 +42,8 @@ public class Server implements Runnable {
             in = new BufferedReader(streamReader);
             String input;
             String output = "-ERR unknown error";
-
-            out.println("+OK POP3 server ready");
+            User user = null;
+            out.println("+OK POP3 server ready\neom");
 
 			/* Thread-blocking while loop waits for commands from the client */
             while ((input = in.readLine()) != null) {
@@ -52,24 +52,71 @@ public class Server implements Runnable {
                 if(state == State.Closed){
 
                 }else if (state == State.Authorisation){
+                    System.out.println("user :" + input);
                     if (input.startsWith("USER")) {
                         String username = input.split(" ")[1];
-                        System.out.println(username);
-                        User user = User.getUser(username);
+                        user = User.getUser(username);
                         if(user == null){
                             output = "-ERR username not recognized";
                         }
                         else{
                             output = "+OK Waiting for password";
+                            state = State.PwdWaiting;
                         }
                     }
                 }else if (state == State.PwdWaiting){
-
-                }else{
+                    if (input.startsWith("PASS")) {
+                        if(user == null){
+                            System.err.println("User is null, impossible");
+                        }
+                        String pwd = input.split(" ")[1];
+                        if(user.getPassword().equals(pwd)){
+                            output = "+OK Password is correct, logged in";
+                            state = State.Transaction;
+                        }
+                        else{
+                            output = "-ERR wrong password";
+                        }
+                    }
+                }
+                else{
 				    if (input.startsWith("QUIT")) {
                         break;
                     }
+                    else if (input.startsWith("APOP")) {
+
+                    }
+                    else if (input.startsWith("STAT")) {
+                        Integer sum = 0, nb = 0;
+				        for(Mail mail : user.getMails()){
+                            sum += mail.getSize();
+                            nb++;
+                        }
+                        output = " +OK " + nb + " " + sum;
+                    }
+                    else if (input.startsWith("RETR")) {
+                        Integer id = Integer.parseInt(input.split(" ")[1]);
+                        for(Mail mail : user.getMails()){
+                            if(mail.getMessageId() == id){
+                                output = "+OK " + mail.getMessageId() + " " + mail.getSize() + "\n";
+                                output += "From : " + mail.getFromName() + " <" + mail.getFromAdress() + ">\n";
+                                output += "To : " + mail.getUser().getUsername() + " <" + mail.getUser().getAddress() + ">\n";
+                                output += "Subject : " + mail.getObject() + "\n";
+                                output += "Date : " + mail.getDate().toString() + "\n";
+                                output += "Id : " + mail.getMessageId() + "\n";
+                                output += mail.getContent();
+                                break;
+                            }
+                        }
+                    }
+                    else if (input.startsWith("LIST")) {
+                        output = "+OK " + user.getMails().size() + " messages:";
+				        for(Mail mail : user.getMails()){
+                            output+= "\n" + mail.getMessageId() + " " + mail.getSize();
+                        }
+                    }
                 }
+                output += "\r\neom";
 				out.println(output);
             }
         } catch (SocketTimeoutException e) {
