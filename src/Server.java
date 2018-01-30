@@ -59,6 +59,9 @@ public class Server implements Runnable {
                         if(user == null){
                             output = "-ERR username not recognized";
                         }
+                        else if(user.getLock() == true){
+                            output = "-ERR user is already in use";
+                        }
                         else{
                             output = "+OK Waiting for password";
                             state = State.PwdWaiting;
@@ -69,10 +72,14 @@ public class Server implements Runnable {
                         if(user == null){
                             System.err.println("User is null, impossible");
                         }
+                        else if(user.getLock() == true){
+                            output = "-ERR user is already in use";
+                        }
                         String pwd = input.split(" ")[1];
                         if(user.getPassword().equals(pwd)){
                             output = "+OK Password is correct, logged in";
                             state = State.Transaction;
+                            user.setLock(true);
                         }
                         else{
                             output = "-ERR wrong password";

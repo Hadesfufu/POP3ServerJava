@@ -7,6 +7,16 @@ public class User {
     private String username;
     private String password;
     private String address;
+    private Boolean lock = false;
+
+    public Boolean getLock() {
+        return lock;
+    }
+
+    public void setLock(Boolean lock) {
+        this.lock = lock;
+    }
+
     private ArrayList<Mail> mails = new ArrayList<>();
 
     public ArrayList<Mail> getMails() {
