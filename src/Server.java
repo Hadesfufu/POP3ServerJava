@@ -43,7 +43,7 @@ public class Server implements Runnable {
             String input;
             String output = "-ERR unknown error";
             User user = null;
-            out.println("+OK POP3 server ready\neom");
+            out.println("+OK POP3 server ready");
 
 			/* Thread-blocking while loop waits for commands from the client */
             while ((input = in.readLine()) != null) {
@@ -121,9 +121,9 @@ public class Server implements Runnable {
 				        for(Mail mail : user.getMails()){
                             output+= "\n" + mail.getMessageId() + " " + mail.getSize();
                         }
+                        output+="\n.";
                     }
                 }
-                output += "\r\neom";
 				out.println(output);
             }
         } catch (SocketTimeoutException e) {
